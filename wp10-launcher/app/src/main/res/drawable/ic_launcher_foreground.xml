@@ -5,8 +5,7 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     <!-- Windows logo-style 4-tile icon -->
-    <rect android:x="20" android:y="20" android:width="30" android:height="30" android:fillColor="#FFFFFF"/>
-    <rect android:x="58" android:y="20" android:width="30" android:height="30" android:fillColor="#FFFFFF"/>
-    <rect android:x="20" android:y="58" android:width="30" android:height="30" android:fillColor="#FFFFFF"/>
-    <rect android:x="58" android:y="58" android:width="30" android:height="30" android:fillColor="#FFFFFF"/>
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M20,20h30v30h-30z M58,20h30v30h-30z M20,58h30v30h-30z M58,58h30v30h-30z"/>
 </vector>
