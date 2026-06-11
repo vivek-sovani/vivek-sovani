@@ -159,7 +159,7 @@ class AppDrawerActivity : AppCompatActivity() {
         finish()
     }
 
-    inner class AppListAdapter(
+    class AppListAdapter(
         private val apps: List<AppInfo>,
         private val onAppClick: (AppInfo) -> Unit
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
