@@ -1,8 +1,6 @@
 package com.windowsmobile.launcher
 
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,9 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.windowsmobile.launcher.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -25,6 +23,7 @@ class HomeFragment : Fragment() {
     private val tiles = mutableListOf<AppTile>()
     private val handler = Handler(Looper.getMainLooper())
     private var clockUpdateRunnable: Runnable? = null
+    private var isEditMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,19 +46,19 @@ class HomeFragment : Fragment() {
         val gridLayoutManager = GridLayoutManager(requireContext(), TileAdapter.COLUMNS)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (position < tiles.size) {
-                    tiles[position].tileSize.columnSpan
-                } else {
-                    1
-                }
+                return if (position < tiles.size) tiles[position].tileSize.columnSpan else 1
             }
         }
 
         tileAdapter = TileAdapter(
             context = requireContext(),
             tiles = tiles,
-            onTileClick = { tile -> launchTile(tile) },
-            onTileLongClick = { tile, position -> enterEditMode(tile, position) }
+            onTileClick = { tile, position ->
+                if (isEditMode) showTileOptionsDialog(tile, position)
+                else launchTile(tile)
+            },
+            onTileLongClick = { tile, position -> enterEditMode(tile, position) },
+            onTileRemove = { position -> removeTile(position) }
         )
 
         binding.tileRecyclerView.apply {
@@ -76,65 +75,89 @@ class HomeFragment : Fragment() {
         tiles.clear()
         tiles.addAll(tilesToLoad)
 
-        // Load icons asynchronously
         Thread {
             tilesToLoad.forEach { tile ->
                 if (!tile.isSystemTile) {
                     try {
-                        val pm = requireContext().packageManager
-                        val icon = pm.getApplicationIcon(tile.packageName)
-                        tile.icon = icon
+                        tile.icon = requireContext().packageManager.getApplicationIcon(tile.packageName)
                     } catch (e: PackageManager.NameNotFoundException) {
-                        // Use default icon
+                        // no icon available
                     }
                 }
             }
-            activity?.runOnUiThread {
-                tileAdapter.notifyDataSetChanged()
-            }
+            activity?.runOnUiThread { tileAdapter.notifyDataSetChanged() }
         }.start()
     }
 
     private fun launchTile(tile: AppTile) {
         if (tile.isSystemTile) return
-
-        try {
-            val pm = requireContext().packageManager
-            val launchIntent = pm.getLaunchIntentForPackage(tile.packageName)
-            if (launchIntent != null) {
-                startActivity(launchIntent)
-            } else {
-                // Try direct activity launch
-                val intent = Intent().apply {
-                    setClassName(tile.packageName, tile.activityName)
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                startActivity(intent)
-            }
-        } catch (e: Exception) {
-            Toast.makeText(
-                requireContext(),
-                "App not installed: ${tile.label}",
-                Toast.LENGTH_SHORT
-            ).show()
+        val launchIntent = requireContext().packageManager.getLaunchIntentForPackage(tile.packageName)
+        if (launchIntent != null) {
+            startActivity(launchIntent)
+        } else {
+            Toast.makeText(requireContext(), "${tile.label} is not installed", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun enterEditMode(tile: AppTile, position: Int) {
+        isEditMode = true
         tileAdapter.setEditMode(true)
-        Toast.makeText(requireContext(), "Edit mode: Long press to move tiles", Toast.LENGTH_SHORT).show()
+        (activity as? MainActivity)?.setEditMode(true)
+        showTileOptionsDialog(tile, position)
     }
 
     fun exitEditMode() {
+        isEditMode = false
         tileAdapter.setEditMode(false)
+        (activity as? MainActivity)?.setEditMode(false)
         tileManager.saveTiles(tileAdapter.getTiles())
+    }
+
+    private fun showTileOptionsDialog(tile: AppTile, position: Int) {
+        if (position < 0 || position >= tiles.size) return
+        val current = tiles[position].tileSize
+        val check = "  ✓"
+        val options = arrayOf(
+            "Small  (1×1)${if (current == TileSize.SMALL) check else ""}",
+            "Medium (2×2)${if (current == TileSize.MEDIUM) check else ""}",
+            "Wide   (4×2)${if (current == TileSize.WIDE) check else ""}",
+            "Large  (4×4)${if (current == TileSize.LARGE) check else ""}",
+            "Remove tile"
+        )
+        AlertDialog.Builder(requireContext(), R.style.WPAlertDialog)
+            .setTitle(tile.label)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> resizeTile(position, TileSize.SMALL)
+                    1 -> resizeTile(position, TileSize.MEDIUM)
+                    2 -> resizeTile(position, TileSize.WIDE)
+                    3 -> resizeTile(position, TileSize.LARGE)
+                    4 -> removeTile(position)
+                }
+            }
+            .setNeutralButton("Done editing") { _, _ -> exitEditMode() }
+            .show()
+    }
+
+    private fun resizeTile(position: Int, newSize: TileSize) {
+        if (position < 0 || position >= tiles.size) return
+        tiles[position].tileSize = newSize
+        tileAdapter.notifyDataSetChanged()
+        tileManager.saveTiles(tiles)
+    }
+
+    private fun removeTile(position: Int) {
+        if (position < 0 || position >= tiles.size) return
+        tiles.removeAt(position)
+        tileAdapter.notifyDataSetChanged()
+        tileManager.saveTiles(tiles)
     }
 
     private fun startClockUpdate() {
         clockUpdateRunnable = object : Runnable {
             override fun run() {
-                tileAdapter.notifyItemChanged(0) // Clock is always first tile
-                handler.postDelayed(this, 60000) // Update every minute
+                tileAdapter.notifyItemChanged(0)
+                handler.postDelayed(this, 60000)
             }
         }
         handler.postDelayed(clockUpdateRunnable!!, 60000)

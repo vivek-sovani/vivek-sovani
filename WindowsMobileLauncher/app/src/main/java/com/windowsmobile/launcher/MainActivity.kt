@@ -63,22 +63,22 @@ class MainActivity : AppCompatActivity() {
         overridePendingTransition(R.anim.slide_up, R.anim.no_anim)
     }
 
+    fun setEditMode(editing: Boolean) {
+        isEditMode = editing
+    }
+
     override fun onBackPressed() {
         if (isEditMode) {
             homeFragment.exitEditMode()
-            isEditMode = false
         } else {
             // On home screen, back does nothing (standard launcher behavior)
-            // Or optionally open app drawer
         }
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        // Called when home button is pressed while already in launcher
         if (isEditMode) {
             homeFragment.exitEditMode()
-            isEditMode = false
         }
     }
 }

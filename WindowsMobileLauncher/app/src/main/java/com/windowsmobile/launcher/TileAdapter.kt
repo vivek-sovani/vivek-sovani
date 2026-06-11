@@ -1,7 +1,5 @@
 package com.windowsmobile.launcher
 
-import android.animation.AnimatorInflater
-import android.animation.AnimatorSet
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -18,8 +16,9 @@ import java.util.*
 class TileAdapter(
     private val context: Context,
     private var tiles: MutableList<AppTile>,
-    private val onTileClick: (AppTile) -> Unit,
-    private val onTileLongClick: (AppTile, Int) -> Unit
+    private val onTileClick: (AppTile, Int) -> Unit,
+    private val onTileLongClick: (AppTile, Int) -> Unit,
+    private val onTileRemove: (Int) -> Unit
 ) : RecyclerView.Adapter<TileAdapter.TileViewHolder>() {
 
     companion object {
@@ -46,8 +45,7 @@ class TileAdapter(
     }
 
     override fun onBindViewHolder(holder: TileViewHolder, position: Int) {
-        val tile = tiles[position]
-        holder.bind(tile)
+        holder.bind(tiles[position])
     }
 
     override fun getItemCount() = tiles.size
@@ -74,13 +72,11 @@ class TileAdapter(
         private val editBadge: View? = itemView.findViewById(R.id.editBadge)
 
         fun bind(tile: AppTile) {
-            // Set background color
             val color = if (tile.tileColor != 0) tile.tileColor else TileManager.DEFAULT_ACCENT
             tileCard.setCardBackgroundColor(color)
             tileCard.radius = 0f
             tileCard.cardElevation = 0f
 
-            // Set icon
             if (tile.icon != null) {
                 tileIcon.setImageDrawable(tile.icon)
                 tileIcon.visibility = View.VISIBLE
@@ -88,11 +84,9 @@ class TileAdapter(
                 tileIcon.visibility = View.GONE
             }
 
-            // Set label
             tileLabel.text = tile.label
             tileLabel.setTextColor(Color.WHITE)
 
-            // Clock tile specifics
             if (tile.id == "clock") {
                 tileTime?.text = timeFormat.format(Date())
                 tileDate?.text = dateFormat.format(Date())
@@ -104,24 +98,30 @@ class TileAdapter(
                 tileDate?.visibility = View.GONE
             }
 
-            // Edit mode badge
-            editBadge?.visibility = if (isEditMode) View.VISIBLE else View.GONE
+            // X badge visible in edit mode for non-system tiles; tapping it removes the tile
+            val showBadge = isEditMode && !tile.isSystemTile
+            editBadge?.visibility = if (showBadge) View.VISIBLE else View.GONE
+            editBadge?.setOnClickListener {
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) onTileRemove(pos)
+            }
 
-            // Click listeners
             tileCard.setOnClickListener {
+                val pos = bindingAdapterPosition
+                if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
                 if (!isEditMode) {
                     val anim = AnimationUtils.loadAnimation(context, R.anim.tile_press)
                     itemView.startAnimation(anim)
-                    onTileClick(tile)
                 }
+                onTileClick(tile, pos)
             }
 
             tileCard.setOnLongClickListener {
-                onTileLongClick(tile, bindingAdapterPosition)
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) onTileLongClick(tile, pos)
                 true
             }
 
-            // Entrance animation
             val slideIn = AnimationUtils.loadAnimation(context, R.anim.tile_slide_in)
             slideIn.startOffset = (bindingAdapterPosition * 50L).coerceAtMost(400L)
             itemView.startAnimation(slideIn)
