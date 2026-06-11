@@ -53,13 +53,6 @@ class HomeFragment : Fragment() {
                         tileManager.updateTile(it)
                         saveTiles()
                     }
-                    "transparent" -> tile?.let {
-                        val isTransparent = data.getBooleanExtra("transparent", false)
-                        tileGrid.updateTileTransparency(it.id, isTransparent)
-                        it.isTransparent = isTransparent
-                        tileManager.updateTile(it)
-                        saveTiles()
-                    }
                 }
             }
         }
@@ -77,19 +70,25 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tileManager = TileManager(requireContext())
-        setupTileGrid()
+        try {
+            setupTileGrid()
+        } catch (e: Exception) {
+            // Grid setup failed — show empty grid to avoid crash loop
+        }
         startClock()
     }
 
     override fun onResume() {
         super.onResume()
         if (::tileGrid.isInitialized) {
-            val freshTiles = tileManager.loadTiles()
-            val currentIds = tileGrid.getTilesData().map { it.id }
-            val freshIds = freshTiles.map { it.id }
-            if (currentIds != freshIds) {
-                tileGrid.setTiles(freshTiles, tileManager)
-            }
+            try {
+                val freshTiles = tileManager.loadTiles()
+                val currentIds = tileGrid.getTilesData().map { it.id }
+                val freshIds = freshTiles.map { it.id }
+                if (currentIds != freshIds) {
+                    tileGrid.setTiles(freshTiles, tileManager)
+                }
+            } catch (e: Exception) { }
         }
     }
 

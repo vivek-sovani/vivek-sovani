@@ -9,6 +9,7 @@ object PrefsHelper {
     private const val KEY_ACCENT = "accent_color"
     private const val KEY_DARK_THEME = "dark_theme"
     private const val KEY_WALLPAPER_URI = "wallpaper_uri"
+    private const val KEY_START_TRANSPARENT = "start_transparent"
 
     // Default Windows Phone accent blue
     private const val DEFAULT_ACCENT = 0xFF0078D7.toInt()
@@ -41,6 +42,16 @@ object PrefsHelper {
     fun setWallpaperUri(context: Context, uri: String?) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putString(KEY_WALLPAPER_URI, uri).apply()
+    }
+
+    fun isStartTransparent(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_START_TRANSPARENT, false)
+    }
+
+    fun setStartTransparent(context: Context, value: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_START_TRANSPARENT, value).apply()
     }
 
     val ACCENT_COLORS = listOf(

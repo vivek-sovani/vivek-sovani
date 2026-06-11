@@ -42,6 +42,7 @@ class SettingsActivity : AppCompatActivity() {
         setupWallpaperSection()
         setupAccentColors()
         setupThemeToggle()
+        setupTransparencyToggle()
         setupToolbar()
     }
 
@@ -102,6 +103,14 @@ class SettingsActivity : AppCompatActivity() {
         binding.switchDarkTheme.isChecked = PrefsHelper.isDarkTheme(this)
         binding.switchDarkTheme.setOnCheckedChangeListener { _, checked ->
             PrefsHelper.setDarkTheme(this, checked)
+        }
+    }
+
+    private fun setupTransparencyToggle() {
+        binding.switchStartTransparent.isChecked = PrefsHelper.isStartTransparent(this)
+        binding.switchStartTransparent.setOnCheckedChangeListener { _, checked ->
+            PrefsHelper.setStartTransparent(this, checked)
+            setResult(RESULT_OK)
         }
     }
 

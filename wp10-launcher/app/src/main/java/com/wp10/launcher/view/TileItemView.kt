@@ -140,14 +140,15 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
     fun refreshVisuals() {
         val accentColor = PrefsHelper.getAccentColor(context)
         val bgColor = when {
-            tileData.isTransparent -> Color.TRANSPARENT
+            PrefsHelper.isStartTransparent(context) ->
+                Color.argb(100, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor))
             tileData.customColor != 0 -> tileData.customColor
             else -> accentColor
         }
         frontFace.setBackgroundColor(bgColor)
         backFace.setBackgroundColor(bgColor)
 
-        // Icon size proportional to tile
+        // Icon centered; size proportional to tile size
         val iconSize = when (tileData.tileSize) {
             TileSize.SMALL -> dp(28)
             TileSize.MEDIUM -> dp(52)
@@ -157,18 +158,12 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
         iconView.layoutParams = (iconView.layoutParams as LayoutParams).also {
             it.width = iconSize
             it.height = iconSize
-            // Shift icon upward on medium/large to leave room for label
-            it.gravity = when (tileData.tileSize) {
-                TileSize.SMALL -> Gravity.CENTER
-                else -> Gravity.CENTER_HORIZONTAL or Gravity.TOP
-            }
-            it.topMargin = when (tileData.tileSize) {
-                TileSize.SMALL -> 0
-                TileSize.MEDIUM -> dp(20)
-                TileSize.WIDE -> dp(14)
-                TileSize.LARGE -> dp(32)
-            }
+            it.gravity = Gravity.CENTER
+            it.topMargin = 0
         }
+
+        // Label hidden on Small tiles; shown at bottom-left on larger tiles
+        labelView.visibility = if (tileData.tileSize == TileSize.SMALL) View.GONE else View.VISIBLE
 
         loadIcon()
         updateBadge()

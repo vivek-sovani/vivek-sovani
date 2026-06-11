@@ -160,6 +160,47 @@
 
         </LinearLayout>
 
+        <!-- Divider -->
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="#22FFFFFF" android:layout_marginTop="8dp"/>
+
+        <!-- Section: Start -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="start"
+            android:textColor="@color/wp_accent"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Show more background"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <Switch
+                android:id="@+id/switchStartTransparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:thumbTint="@color/wp_accent"
+                android:trackTint="#44FFFFFF" />
+
+        </LinearLayout>
+
         <View android:layout_width="match_parent" android:layout_height="48dp" />
 
     </LinearLayout>

@@ -36,9 +36,11 @@ class AppsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tileManager = TileManager(requireContext())
-        setupRecyclerView()
-        setupSearch()
-        setupLetterIndex()
+        try {
+            setupRecyclerView()
+            setupSearch()
+            setupLetterIndex()
+        } catch (e: Exception) { }
         if (!appsLoaded) loadApps()
     }
 

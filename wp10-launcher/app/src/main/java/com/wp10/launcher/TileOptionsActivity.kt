@@ -26,18 +26,6 @@ class TileOptionsActivity : AppCompatActivity() {
         val t = tile ?: return
         binding.tvTileName.text = t.label
 
-        // Transparency toggle
-        binding.switchTransparent.isChecked = t.isTransparent
-        binding.switchTransparent.setOnCheckedChangeListener { _, checked ->
-            val result = Intent().apply {
-                putExtra("action", "transparent")
-                putExtra("tile", t)
-                putExtra("transparent", checked)
-            }
-            setResult(RESULT_OK, result)
-            finish()
-        }
-
         // Size swatch buttons — highlight the current size, others dimmed
         val sizeButtons = mapOf(
             TileSize.SMALL to binding.btnSizeSmall as View,
