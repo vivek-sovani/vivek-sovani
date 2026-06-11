@@ -12,9 +12,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.content.ContentUris
 import android.provider.CalendarContract
 import android.provider.CallLog
 import android.provider.ContactsContract
+import android.provider.MediaStore
 import android.provider.Telephony
 import android.telephony.TelephonyManager
 import android.view.View
@@ -197,6 +199,8 @@ class LauncherActivity : AppCompatActivity() {
                 updateSmsBadge()
                 updateCallBadge()
                 updateCalendarBadge()
+                updatePhotosBadge()
+                updateContactsBadge()
                 badgeHandler.postDelayed(this, 30_000)
             }
         }
@@ -288,6 +292,53 @@ class LauncherActivity : AppCompatActivity() {
         } catch (e: Exception) { }
     }
 
+    private fun updatePhotosBadge() {
+        val hasMedia = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+        val hasStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        if (!hasMedia && !hasStorage) return
+        try {
+            val cursor = contentResolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                arrayOf(MediaStore.Images.Media._ID),
+                null, null,
+                "${MediaStore.Images.Media.DATE_TAKEN} DESC"
+            )
+            val uri = if (cursor?.moveToFirst() == true) {
+                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cursor.getLong(0)).toString()
+            } else null
+            cursor?.close()
+            val photosPackages = setOf("com.google.android.apps.photos", "com.android.gallery3d",
+                "com.samsung.android.gallery.app", "com.miui.gallery")
+            photosPackages.forEach { getHomeFragment()?.updatePhotoTile(it, uri) }
+        } catch (e: Exception) { }
+    }
+
+    private fun updateContactsBadge() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+            != PackageManager.PERMISSION_GRANTED) return
+        try {
+            val uris = mutableListOf<String>()
+            val cursor = contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                arrayOf(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI),
+                "${ContactsContract.Contacts.HAS_PHONE_NUMBER}=1 AND ${ContactsContract.Contacts.PHOTO_THUMBNAIL_URI} IS NOT NULL",
+                null, null
+            )
+            if (cursor != null) {
+                val col = cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI)
+                while (cursor.moveToNext()) {
+                    val photoUri = if (col >= 0) cursor.getString(col) else null
+                    if (!photoUri.isNullOrEmpty()) uris.add(photoUri)
+                }
+                cursor.close()
+            }
+            val selected = uris.shuffled().take(3)
+            val contactPackages = setOf("com.android.contacts", "com.google.android.contacts",
+                "com.samsung.android.contacts")
+            contactPackages.forEach { getHomeFragment()?.updateContactsTile(it, selected) }
+        } catch (e: Exception) { }
+    }
+
     private fun lookupContactName(number: String): String? {
         if (number.isBlank()) return null
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
@@ -328,6 +379,10 @@ class LauncherActivity : AppCompatActivity() {
             if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED)
                 needed.add(perm)
         }
+        val mediaPerm = if (android.os.Build.VERSION.SDK_INT >= 33)
+            Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
+        if (ContextCompat.checkSelfPermission(this, mediaPerm) != PackageManager.PERMISSION_GRANTED)
+            needed.add(mediaPerm)
         if (needed.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, needed.toTypedArray(), PERMISSION_REQUEST_CODE)
         }

@@ -14,6 +14,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.wp10.launcher.R
 import com.wp10.launcher.model.TileData
@@ -34,10 +35,13 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
     private val backSenderView = TextView(context)
     private val backPreviewView = TextView(context)
     private val backCountView = TextView(context)
+    private val backPhotoView = ImageView(context)
+    private val backContactsContainer = LinearLayout(context)
 
     private val liveHandler = Handler(Looper.getMainLooper())
     private var isShowingBack = false
     private var isEditMode = false
+    private var hasVisualBack = false
 
     private val wobbleAnimator: ObjectAnimator by lazy {
         ObjectAnimator.ofFloat(this, "rotation", -2f, 2f).apply {
@@ -171,6 +175,34 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
             }
         }
 
+        // Full-face photo for Photos tile
+        backPhotoView.apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            visibility = View.GONE
+        }
+
+        // Row of circular contact photos for Contacts tile
+        backContactsContainer.apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                gravity = Gravity.CENTER
+            }
+            visibility = View.GONE
+            val sz = dp(44)
+            repeat(3) {
+                addView(ImageView(context).apply {
+                    layoutParams = LinearLayout.LayoutParams(sz, sz).apply {
+                        marginStart = dp(4); marginEnd = dp(4)
+                    }
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                })
+            }
+        }
+
+        backFace.addView(backPhotoView)
+        backFace.addView(backContactsContainer)
         backFace.addView(backLabelView)
         backFace.addView(backSenderView)
         backFace.addView(backPreviewView)
@@ -254,12 +286,58 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
         }
     }
 
+    fun updatePhotoTile(uri: String?) {
+        if (uri != null && tileData.tileSize != TileSize.SMALL) {
+            hasVisualBack = true
+            backPhotoView.visibility = View.VISIBLE
+            backContactsContainer.visibility = View.GONE
+            backSenderView.visibility = View.GONE
+            backPreviewView.visibility = View.GONE
+            backCountView.visibility = View.GONE
+            badgeView.visibility = View.GONE
+            try {
+                com.bumptech.glide.Glide.with(context).load(uri).centerCrop().into(backPhotoView)
+            } catch (e: Exception) {
+                backPhotoView.visibility = View.GONE
+                hasVisualBack = false
+            }
+        } else {
+            hasVisualBack = false
+            backPhotoView.visibility = View.GONE
+        }
+    }
+
+    fun updateContactsTile(uris: List<String>) {
+        if (uris.isNotEmpty() && tileData.tileSize != TileSize.SMALL) {
+            hasVisualBack = true
+            backContactsContainer.visibility = View.VISIBLE
+            backPhotoView.visibility = View.GONE
+            backSenderView.visibility = View.GONE
+            backPreviewView.visibility = View.GONE
+            backCountView.visibility = View.GONE
+            badgeView.visibility = View.GONE
+            val children = (0 until backContactsContainer.childCount)
+                .map { backContactsContainer.getChildAt(it) as ImageView }
+            children.forEachIndexed { idx, iv ->
+                if (idx < uris.size) {
+                    try {
+                        com.bumptech.glide.Glide.with(context)
+                            .load(uris[idx]).circleCrop().into(iv)
+                    } catch (e: Exception) { }
+                }
+            }
+        } else {
+            hasVisualBack = false
+            backContactsContainer.visibility = View.GONE
+        }
+    }
+
     private fun scheduleLiveTileFlip() {
         if (!tileData.liveTileEnabled || tileData.tileSize == TileSize.SMALL) return
         val delay = (5000L + Random.nextLong(5000L))
         liveHandler.postDelayed({
             if (isAttachedToWindow && !isEditMode) {
-                if (tileData.badgeCount > 0) {
+                if (tileData.badgeCount > 0 || hasVisualBack) {
                     flipTile()
                 }
             }

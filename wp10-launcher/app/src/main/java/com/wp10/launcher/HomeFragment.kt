@@ -132,16 +132,16 @@ class HomeFragment : Fragment() {
 
     private fun launchTile(tile: TileData) {
         try {
-            if (tile.activityName.isNotEmpty()) {
-                val intent = Intent().apply {
+            val launchIntent = requireContext().packageManager
+                .getLaunchIntentForPackage(tile.packageName)
+                ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            if (launchIntent != null) {
+                startActivity(launchIntent)
+            } else if (tile.activityName.isNotEmpty()) {
+                startActivity(Intent().apply {
                     component = ComponentName(tile.packageName, tile.activityName)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                startActivity(intent)
-            } else {
-                val intent = requireContext().packageManager.getLaunchIntentForPackage(tile.packageName)
-                    ?: return
-                startActivity(intent)
+                })
             }
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Cannot open ${tile.label}", Toast.LENGTH_SHORT).show()
@@ -160,6 +160,14 @@ class HomeFragment : Fragment() {
 
     fun updateLiveTile(packageName: String, count: Int, sender: String = "", preview: String = "") {
         if (::tileGrid.isInitialized) tileGrid.updateLiveTile(packageName, count, sender, preview)
+    }
+
+    fun updatePhotoTile(packageName: String, uri: String?) {
+        if (::tileGrid.isInitialized) tileGrid.updatePhotoTile(packageName, uri)
+    }
+
+    fun updateContactsTile(packageName: String, uris: List<String>) {
+        if (::tileGrid.isInitialized) tileGrid.updateContactsTile(packageName, uris)
     }
 
     fun refreshAccentColors() {

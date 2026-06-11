@@ -148,6 +148,18 @@ class TileGridView(context: Context) : ViewGroup(context) {
         }
     }
 
+    fun updatePhotoTile(packageName: String, uri: String?) {
+        tileViews.forEachIndexed { idx, view ->
+            if (tiles[idx].packageName == packageName) view.updatePhotoTile(uri)
+        }
+    }
+
+    fun updateContactsTile(packageName: String, uris: List<String>) {
+        tileViews.forEachIndexed { idx, view ->
+            if (tiles[idx].packageName == packageName) view.updateContactsTile(uris)
+        }
+    }
+
     fun refreshAccentColors() {
         tileViews.forEach { it.refreshVisuals() }
     }

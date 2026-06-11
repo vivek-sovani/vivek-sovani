@@ -64,6 +64,11 @@ class TileManager(private val context: Context) {
         // Phone dialer
         addIntentTile(tiles, pm, Intent.ACTION_DIAL, "Phone", TileSize.MEDIUM)
 
+        // Contacts
+        addPackageTile(tiles, pm, "com.android.contacts", "People", TileSize.MEDIUM)
+            ?: addPackageTile(tiles, pm, "com.google.android.contacts", "People", TileSize.MEDIUM)
+            ?: addPackageTile(tiles, pm, "com.samsung.android.contacts", "People", TileSize.MEDIUM)
+
         // SMS/Messaging
         val smsIntent = Intent(Intent.ACTION_SENDTO).apply { data = android.net.Uri.parse("smsto:") }
         addIntentTile(tiles, pm, smsIntent, "Messaging", TileSize.MEDIUM)
