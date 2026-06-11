@@ -44,9 +44,6 @@ class TileGridView(context: Context) : ViewGroup(context) {
     // Drag state
     private var dragTileView: TileItemView? = null
     private var dragTileData: TileData? = null
-    private var dragShadow: ImageView? = null
-    private var dragOriginalX = 0
-    private var dragOriginalY = 0
 
     private val dropIndicatorPaint = Paint().apply {
         color = Color.argb(80, 255, 255, 255)

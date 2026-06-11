@@ -34,7 +34,7 @@ class WallpaperActivity : AppCompatActivity() {
                 val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
                 startActivity(intent)
             } catch (e: Exception) {
-                val intent = Intent(WallpaperManager.ACTION_WALLPAPER_CHOOSER)
+                val intent = Intent(Intent.ACTION_SET_WALLPAPER)
                 try { startActivity(intent) } catch (e2: Exception) { }
             }
         }
