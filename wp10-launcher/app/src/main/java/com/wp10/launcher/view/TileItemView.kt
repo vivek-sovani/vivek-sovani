@@ -31,6 +31,8 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
     private val labelView = TextView(context)
     private val badgeView = TextView(context)
     private val backLabelView = TextView(context)
+    private val backSenderView = TextView(context)
+    private val backPreviewView = TextView(context)
     private val backCountView = TextView(context)
 
     private val liveHandler = Handler(Looper.getMainLooper())
@@ -112,7 +114,6 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
         backFace.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         val pad = dp(8)
 
-        // Back label (app name, top of tile)
         backLabelView.apply {
             setTextColor(Color.WHITE)
             typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
@@ -127,7 +128,39 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
             }
         }
 
-        // Back count (large centered number)
+        // Sender / event title — shown when rich content is available
+        backSenderView.apply {
+            setTextColor(Color.WHITE)
+            typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
+            textSize = 14f
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            visibility = View.GONE
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                gravity = Gravity.TOP or Gravity.START
+                topMargin = dp(30)
+                leftMargin = pad
+                rightMargin = pad
+            }
+        }
+
+        // Message preview / event time
+        backPreviewView.apply {
+            setTextColor(Color.argb(200, 255, 255, 255))
+            typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
+            textSize = 11f
+            maxLines = 2
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            visibility = View.GONE
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                gravity = Gravity.TOP or Gravity.START
+                topMargin = dp(56)
+                leftMargin = pad
+                rightMargin = pad
+            }
+        }
+
+        // Large count — shown when no rich content
         backCountView.apply {
             setTextColor(Color.WHITE)
             typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
@@ -139,6 +172,8 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
         }
 
         backFace.addView(backLabelView)
+        backFace.addView(backSenderView)
+        backFace.addView(backPreviewView)
         backFace.addView(backCountView)
     }
 
@@ -189,13 +224,32 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
     }
 
     fun updateBadge(count: Int = tileData.badgeCount) {
+        updateLiveTile(count, "", "")
+    }
+
+    fun updateLiveTile(count: Int, sender: String, preview: String) {
         tileData.badgeCount = count
         if (count > 0 && tileData.tileSize != TileSize.SMALL) {
             badgeView.text = if (count > 99) "99+" else count.toString()
             badgeView.visibility = View.VISIBLE
-            backCountView.text = count.toString()
+            if (sender.isNotEmpty()) {
+                backSenderView.text = sender
+                backSenderView.visibility = View.VISIBLE
+                backPreviewView.text = preview
+                backPreviewView.visibility = if (preview.isNotEmpty()) View.VISIBLE else View.GONE
+                backCountView.visibility = View.GONE
+                backCountView.text = ""
+            } else {
+                backSenderView.visibility = View.GONE
+                backPreviewView.visibility = View.GONE
+                backCountView.visibility = View.VISIBLE
+                backCountView.text = count.toString()
+            }
         } else {
             badgeView.visibility = View.GONE
+            backSenderView.visibility = View.GONE
+            backPreviewView.visibility = View.GONE
+            backCountView.visibility = View.GONE
             backCountView.text = ""
         }
     }

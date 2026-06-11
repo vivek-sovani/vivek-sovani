@@ -155,7 +155,11 @@ class HomeFragment : Fragment() {
     }
 
     fun updateBadge(packageName: String, count: Int) {
-        if (::tileGrid.isInitialized) tileGrid.updateBadge(packageName, count)
+        updateLiveTile(packageName, count, "", "")
+    }
+
+    fun updateLiveTile(packageName: String, count: Int, sender: String = "", preview: String = "") {
+        if (::tileGrid.isInitialized) tileGrid.updateLiveTile(packageName, count, sender, preview)
     }
 
     fun refreshAccentColors() {

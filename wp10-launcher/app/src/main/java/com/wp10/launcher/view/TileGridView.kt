@@ -137,9 +137,13 @@ class TileGridView(context: Context) : ViewGroup(context) {
     }
 
     fun updateBadge(packageName: String, count: Int) {
+        updateLiveTile(packageName, count, "", "")
+    }
+
+    fun updateLiveTile(packageName: String, count: Int, sender: String, preview: String) {
         tileViews.forEachIndexed { idx, view ->
             if (tiles[idx].packageName == packageName) {
-                view.updateBadge(count)
+                view.updateLiveTile(count, sender, preview)
             }
         }
     }

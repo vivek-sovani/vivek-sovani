@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.wp10.launcher.databinding.ActivitySettingsBinding
 import com.wp10.launcher.util.PrefsHelper
 
@@ -30,7 +31,7 @@ class SettingsActivity : AppCompatActivity() {
                 )
             } catch (e: Exception) { }
             PrefsHelper.setWallpaperUri(this, uri.toString())
-            binding.ivWallpaperPreview.setImageURI(uri)
+            Glide.with(this).load(uri).centerCrop().into(binding.ivWallpaperPreview)
         }
     }
 
@@ -58,7 +59,7 @@ class SettingsActivity : AppCompatActivity() {
         val uri = PrefsHelper.getWallpaperUri(this)
         if (uri != null) {
             try {
-                binding.ivWallpaperPreview.setImageURI(Uri.parse(uri))
+                Glide.with(this).load(Uri.parse(uri)).centerCrop().into(binding.ivWallpaperPreview)
             } catch (e: Exception) {
                 showSystemWallpaperPreview()
             }

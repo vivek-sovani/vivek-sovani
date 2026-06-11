@@ -12,7 +12,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.CalendarContract
 import android.provider.CallLog
+import android.provider.ContactsContract
 import android.provider.Telephony
 import android.telephony.TelephonyManager
 import android.view.View
@@ -23,8 +25,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.bumptech.glide.Glide
 import com.wp10.launcher.databinding.ActivityLauncherBinding
 import com.wp10.launcher.util.PrefsHelper
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class LauncherActivity : AppCompatActivity() {
 
@@ -114,15 +120,19 @@ class LauncherActivity : AppCompatActivity() {
         val customUri = PrefsHelper.getWallpaperUri(this)
         if (customUri != null) {
             try {
-                binding.wallpaperImage.setImageURI(Uri.parse(customUri))
-                binding.wallpaperImage.scaleType = ImageView.ScaleType.CENTER_CROP
+                Glide.with(this)
+                    .load(Uri.parse(customUri))
+                    .centerCrop()
+                    .into(binding.wallpaperImage)
                 return
             } catch (e: Exception) { }
         }
         try {
             val wm = WallpaperManager.getInstance(this)
-            binding.wallpaperImage.setImageDrawable(wm.drawable)
-            binding.wallpaperImage.scaleType = ImageView.ScaleType.CENTER_CROP
+            Glide.with(this)
+                .load(wm.drawable)
+                .centerCrop()
+                .into(binding.wallpaperImage)
         } catch (e: Exception) {
             binding.wallpaperImage.setImageDrawable(null)
             binding.wallpaperImage.setBackgroundColor(Color.BLACK)
@@ -186,6 +196,7 @@ class LauncherActivity : AppCompatActivity() {
             override fun run() {
                 updateSmsBadge()
                 updateCallBadge()
+                updateCalendarBadge()
                 badgeHandler.postDelayed(this, 30_000)
             }
         }
@@ -197,12 +208,24 @@ class LauncherActivity : AppCompatActivity() {
             != PackageManager.PERMISSION_GRANTED) return
         try {
             val cursor = contentResolver.query(
-                Telephony.Sms.Inbox.CONTENT_URI, arrayOf("read"), "read=0", null, null)
+                Telephony.Sms.Inbox.CONTENT_URI,
+                arrayOf("address", "body"),
+                "read=0", null, "date DESC"
+            )
             val unread = cursor?.count ?: 0
+            var sender = ""
+            var preview = ""
+            if (cursor != null && cursor.moveToFirst()) {
+                val addrIdx = cursor.getColumnIndex("address")
+                val bodyIdx = cursor.getColumnIndex("body")
+                val address = if (addrIdx >= 0) cursor.getString(addrIdx) ?: "" else ""
+                sender = lookupContactName(address) ?: address
+                preview = if (bodyIdx >= 0) (cursor.getString(bodyIdx) ?: "").take(80) else ""
+            }
             cursor?.close()
             val smsPackages = setOf("com.android.mms", "com.google.android.apps.messaging",
                 "com.samsung.android.messaging", "com.oneplus.mms")
-            smsPackages.forEach { getHomeFragment()?.updateBadge(it, unread) }
+            smsPackages.forEach { getHomeFragment()?.updateLiveTile(it, unread, sender, preview) }
         } catch (e: Exception) { }
     }
 
@@ -212,15 +235,82 @@ class LauncherActivity : AppCompatActivity() {
         try {
             val cursor = contentResolver.query(
                 CallLog.Calls.CONTENT_URI,
-                arrayOf(CallLog.Calls.TYPE),
+                arrayOf(CallLog.Calls.CACHED_NAME, CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE),
                 "${CallLog.Calls.TYPE}=${CallLog.Calls.MISSED_TYPE} AND ${CallLog.Calls.NEW}=1",
-                null, null)
+                null, "${CallLog.Calls.DATE} DESC"
+            )
             val missed = cursor?.count ?: 0
+            var caller = ""
+            var callTime = ""
+            if (cursor != null && cursor.moveToFirst()) {
+                val nameIdx = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME)
+                val numIdx = cursor.getColumnIndex(CallLog.Calls.NUMBER)
+                val dateIdx = cursor.getColumnIndex(CallLog.Calls.DATE)
+                caller = (if (nameIdx >= 0) cursor.getString(nameIdx)?.takeIf { it.isNotBlank() } else null)
+                    ?: (if (numIdx >= 0) cursor.getString(numIdx) else "") ?: ""
+                if (dateIdx >= 0) callTime = formatRelativeTime(cursor.getLong(dateIdx))
+            }
             cursor?.close()
             val phonePackages = setOf("com.android.dialer", "com.google.android.dialer",
                 "com.samsung.android.incallui")
-            phonePackages.forEach { getHomeFragment()?.updateBadge(it, missed) }
+            phonePackages.forEach { getHomeFragment()?.updateLiveTile(it, missed, caller, callTime) }
         } catch (e: Exception) { }
+    }
+
+    private fun updateCalendarBadge() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR)
+            != PackageManager.PERMISSION_GRANTED) return
+        try {
+            val now = System.currentTimeMillis()
+            val endOfDay = now + 24 * 60 * 60 * 1000L
+            val cursor = contentResolver.query(
+                CalendarContract.Events.CONTENT_URI,
+                arrayOf(CalendarContract.Events.TITLE, CalendarContract.Events.DTSTART),
+                "${CalendarContract.Events.DTSTART} >= ? AND ${CalendarContract.Events.DTSTART} <= ?" +
+                    " AND ${CalendarContract.Events.DELETED} = 0",
+                arrayOf(now.toString(), endOfDay.toString()),
+                "${CalendarContract.Events.DTSTART} ASC"
+            )
+            val count = cursor?.count ?: 0
+            var title = ""
+            var time = ""
+            if (cursor != null && cursor.moveToFirst()) {
+                val titleIdx = cursor.getColumnIndex(CalendarContract.Events.TITLE)
+                val startIdx = cursor.getColumnIndex(CalendarContract.Events.DTSTART)
+                if (titleIdx >= 0) title = cursor.getString(titleIdx) ?: ""
+                if (startIdx >= 0) time = SimpleDateFormat("h:mm a", Locale.getDefault())
+                    .format(Date(cursor.getLong(startIdx)))
+            }
+            cursor?.close()
+            val calPackages = setOf("com.google.android.calendar", "com.android.calendar",
+                "com.samsung.android.calendar")
+            calPackages.forEach { getHomeFragment()?.updateLiveTile(it, count, title, time) }
+        } catch (e: Exception) { }
+    }
+
+    private fun lookupContactName(number: String): String? {
+        if (number.isBlank()) return null
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+            != PackageManager.PERMISSION_GRANTED) return null
+        return try {
+            val uri = Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number)
+            )
+            val c = contentResolver.query(uri, arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME), null, null, null)
+            val name = if (c?.moveToFirst() == true) c.getString(0) else null
+            c?.close()
+            name
+        } catch (e: Exception) { null }
+    }
+
+    private fun formatRelativeTime(timeMs: Long): String {
+        val diff = System.currentTimeMillis() - timeMs
+        return when {
+            diff < 60_000 -> "just now"
+            diff < 3_600_000 -> "${diff / 60_000}m ago"
+            diff < 86_400_000 -> "${diff / 3_600_000}h ago"
+            else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timeMs))
+        }
     }
 
     // ─── Permissions ─────────────────────────────────────────────
@@ -230,7 +320,9 @@ class LauncherActivity : AppCompatActivity() {
         val perms = arrayOf(
             Manifest.permission.READ_SMS,
             Manifest.permission.READ_CALL_LOG,
-            Manifest.permission.READ_PHONE_STATE
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.READ_CALENDAR
         )
         perms.forEach { perm ->
             if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED)
