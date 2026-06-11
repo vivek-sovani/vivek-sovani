@@ -145,6 +145,7 @@ class LauncherActivity : AppCompatActivity() {
         binding.viewPager.adapter = LauncherPagerAdapter(this)
         binding.viewPager.offscreenPageLimit = 1
         binding.viewPager.isUserInputEnabled = true
+        binding.viewPager.setCurrentItem(1, false)  // start on home (middle page)
     }
 
     fun setViewPagerEnabled(enabled: Boolean) {
@@ -160,7 +161,7 @@ class LauncherActivity : AppCompatActivity() {
             } catch (e: Exception) { }
         }
         binding.btnApps.setOnClickListener {
-            binding.viewPager.setCurrentItem(1, true)
+            binding.viewPager.setCurrentItem(2, true)
         }
         binding.btnSettings.setOnClickListener {
             startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_REQUEST)
@@ -180,15 +181,15 @@ class LauncherActivity : AppCompatActivity() {
     override fun onBackPressed() {
         when {
             getHomeFragment()?.onBackPressedInActivity() == true -> { /* handled by fragment */ }
-            binding.viewPager.currentItem != 0 -> binding.viewPager.setCurrentItem(0, true)
-            // else: launcher root — do nothing
+            binding.viewPager.currentItem != 1 -> binding.viewPager.setCurrentItem(1, true)
+            // page 1 (home) at root — do nothing (WP10 behavior)
         }
     }
 
     // ─── Fragment helpers ────────────────────────────────────────
 
     private fun getHomeFragment(): HomeFragment? =
-        supportFragmentManager.findFragmentByTag("f0") as? HomeFragment
+        supportFragmentManager.findFragmentByTag("f1") as? HomeFragment
 
     // ─── Badge updates ───────────────────────────────────────────
 
@@ -395,9 +396,10 @@ class LauncherActivity : AppCompatActivity() {
 }
 
 private class LauncherPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
-    override fun getItemCount() = 2
+    override fun getItemCount() = 3
     override fun createFragment(position: Int): Fragment = when (position) {
-        0 -> HomeFragment()
+        0 -> GoogleFragment()
+        1 -> HomeFragment()
         else -> AppsFragment()
     }
 }
