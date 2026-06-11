@@ -61,7 +61,7 @@
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#22FFFFFF" />
 
-            <!-- Size section -->
+            <!-- Size section label -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,59 +70,128 @@
                 android:textSize="12sp"
                 android:paddingStart="16dp"
                 android:paddingTop="12dp"
-                android:paddingBottom="6dp"
+                android:paddingBottom="8dp"
                 android:fontFamily="sans-serif-light" />
 
-            <!-- Size buttons grid -->
+            <!-- Size visual swatches row 1: Small + Medium -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
-                android:gravity="center">
+                android:paddingBottom="8dp">
 
-                <Button
+                <FrameLayout
                     android:id="@+id/btnSizeSmall"
-                    style="@style/WP.SizeButton"
                     android:layout_width="0dp"
+                    android:layout_height="68dp"
                     android:layout_weight="1"
-                    android:text="Small" />
+                    android:background="#22FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <View
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:background="@color/wp_accent" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginBottom="6dp"
+                        android:text="small"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-light" />
+                </FrameLayout>
 
-                <Button
+                <View android:layout_width="8dp" android:layout_height="match_parent" />
+
+                <FrameLayout
                     android:id="@+id/btnSizeMedium"
-                    style="@style/WP.SizeButton"
                     android:layout_width="0dp"
+                    android:layout_height="68dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:text="Medium" />
+                    android:background="#22FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <View
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:background="@color/wp_accent" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginBottom="6dp"
+                        android:text="medium"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-light" />
+                </FrameLayout>
 
             </LinearLayout>
 
+            <!-- Size visual swatches row 2: Wide + Large -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="12dp"
-                android:gravity="center">
+                android:paddingBottom="12dp">
 
-                <Button
+                <FrameLayout
                     android:id="@+id/btnSizeWide"
-                    style="@style/WP.SizeButton"
                     android:layout_width="0dp"
+                    android:layout_height="68dp"
                     android:layout_weight="1"
-                    android:text="Wide" />
+                    android:background="#22FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <View
+                        android:layout_width="54dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:background="@color/wp_accent" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginBottom="6dp"
+                        android:text="wide"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-light" />
+                </FrameLayout>
 
-                <Button
+                <View android:layout_width="8dp" android:layout_height="match_parent" />
+
+                <FrameLayout
                     android:id="@+id/btnSizeLarge"
-                    style="@style/WP.SizeButton"
                     android:layout_width="0dp"
+                    android:layout_height="68dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:text="Large" />
+                    android:background="#22FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <View
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:layout_gravity="center"
+                        android:background="@color/wp_accent" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginBottom="6dp"
+                        android:text="large"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-light" />
+                </FrameLayout>
 
             </LinearLayout>
 

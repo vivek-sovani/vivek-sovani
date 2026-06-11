@@ -40,6 +40,7 @@ class TileGridView(context: Context) : ViewGroup(context) {
     var onTileUnpin: ((TileData) -> Unit)? = null
     var onTileResize: ((TileData) -> Unit)? = null
     var onTileOptions: ((TileData, TileItemView) -> Unit)? = null
+    var onEditModeChanged: ((Boolean) -> Unit)? = null
 
     // Drag state
     private var dragTileView: TileItemView? = null
@@ -130,6 +131,7 @@ class TileGridView(context: Context) : ViewGroup(context) {
     fun setEditMode(edit: Boolean) {
         isEditMode = edit
         tileViews.forEach { it.setEditMode(edit) }
+        onEditModeChanged?.invoke(edit)
         invalidate()
     }
 

@@ -140,7 +140,7 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
     fun refreshVisuals() {
         val accentColor = PrefsHelper.getAccentColor(context)
         val bgColor = when {
-            tileData.isTransparent -> Color.argb(120, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor))
+            tileData.isTransparent -> Color.TRANSPARENT
             tileData.customColor != 0 -> tileData.customColor
             else -> accentColor
         }

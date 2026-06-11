@@ -3,13 +3,10 @@ package com.wp10.launcher
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.Window
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.wp10.launcher.databinding.ActivityTileOptionsBinding
 import com.wp10.launcher.model.TileData
 import com.wp10.launcher.model.TileSize
-import com.wp10.launcher.util.PrefsHelper
 
 class TileOptionsActivity : AppCompatActivity() {
 
@@ -41,19 +38,16 @@ class TileOptionsActivity : AppCompatActivity() {
             finish()
         }
 
-        // Size options
+        // Size swatch buttons — highlight the current size, others dimmed
         val sizeButtons = mapOf(
-            TileSize.SMALL to binding.btnSizeSmall,
-            TileSize.MEDIUM to binding.btnSizeMedium,
-            TileSize.WIDE to binding.btnSizeWide,
-            TileSize.LARGE to binding.btnSizeLarge
+            TileSize.SMALL to binding.btnSizeSmall as View,
+            TileSize.MEDIUM to binding.btnSizeMedium as View,
+            TileSize.WIDE to binding.btnSizeWide as View,
+            TileSize.LARGE to binding.btnSizeLarge as View
         )
 
         sizeButtons.forEach { (size, btn) ->
-            if (size == t.tileSize) {
-                btn.isSelected = true
-                btn.alpha = 1f
-            }
+            btn.alpha = if (size == t.tileSize) 1f else 0.45f
             btn.setOnClickListener {
                 val result = Intent().apply {
                     putExtra("action", "resize")
