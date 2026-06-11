@@ -142,14 +142,15 @@ class HomeFragment : Fragment() {
     private fun resizeTile(position: Int, newSize: TileSize) {
         if (position < 0 || position >= tiles.size) return
         tiles[position].tileSize = newSize
-        tileAdapter.notifyDataSetChanged()
+        tileAdapter.notifyItemRangeChanged(0, tiles.size)
         tileManager.saveTiles(tiles)
     }
 
     private fun removeTile(position: Int) {
         if (position < 0 || position >= tiles.size) return
         tiles.removeAt(position)
-        tileAdapter.notifyDataSetChanged()
+        tileAdapter.notifyItemRemoved(position)
+        tileAdapter.notifyItemRangeChanged(position, tiles.size - position)
         tileManager.saveTiles(tiles)
     }
 

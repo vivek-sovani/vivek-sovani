@@ -28,6 +28,7 @@ class TileAdapter(
     }
 
     private var isEditMode = false
+    private val animatedIds = mutableSetOf<String>()
     private val timeFormat = SimpleDateFormat("h:mm", Locale.getDefault())
     private val dateFormat = SimpleDateFormat("EEEE\nMMMM d", Locale.getDefault())
 
@@ -52,11 +53,12 @@ class TileAdapter(
 
     fun setEditMode(editMode: Boolean) {
         isEditMode = editMode
-        notifyDataSetChanged()
+        notifyItemRangeChanged(0, tiles.size)
     }
 
     fun updateTiles(newTiles: List<AppTile>) {
         tiles.clear()
+        animatedIds.clear()
         tiles.addAll(newTiles)
         notifyDataSetChanged()
     }
@@ -122,9 +124,11 @@ class TileAdapter(
                 true
             }
 
-            val slideIn = AnimationUtils.loadAnimation(context, R.anim.tile_slide_in)
-            slideIn.startOffset = (bindingAdapterPosition * 50L).coerceAtMost(400L)
-            itemView.startAnimation(slideIn)
+            if (animatedIds.add(tile.id)) {
+                val slideIn = AnimationUtils.loadAnimation(context, R.anim.tile_slide_in)
+                slideIn.startOffset = (bindingAdapterPosition * 50L).coerceAtMost(400L)
+                itemView.startAnimation(slideIn)
+            }
         }
     }
 }
