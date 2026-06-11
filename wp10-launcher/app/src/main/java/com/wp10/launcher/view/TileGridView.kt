@@ -41,6 +41,7 @@ class TileGridView(context: Context) : ViewGroup(context) {
     var onTileResize: ((TileData) -> Unit)? = null
     var onTileOptions: ((TileData, TileItemView) -> Unit)? = null
     var onEditModeChanged: ((Boolean) -> Unit)? = null
+    var onTileMoved: (() -> Unit)? = null
 
     // Drag state
     private var dragTileView: TileItemView? = null
@@ -305,6 +306,11 @@ class TileGridView(context: Context) : ViewGroup(context) {
                 invalidate()
                 return true
             }
+            DragEvent.ACTION_DRAG_EXITED -> {
+                dropHighlightRect = null
+                invalidate()
+                return true
+            }
             DragEvent.ACTION_DRAG_ENDED -> {
                 dragTileView?.alpha = 1f
                 dragTileView = null
@@ -334,6 +340,7 @@ class TileGridView(context: Context) : ViewGroup(context) {
         tile.gridY = newRow
         markGridOccupied(tile)
         requestLayout()
+        onTileMoved?.invoke()
     }
 
     private fun dp(value: Int): Int =

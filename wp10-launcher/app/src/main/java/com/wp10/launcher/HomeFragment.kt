@@ -117,6 +117,7 @@ class HomeFragment : Fragment() {
         tileGrid.onEditModeChanged = { edit ->
             (activity as? LauncherActivity)?.setViewPagerEnabled(!edit)
         }
+        tileGrid.onTileMoved = { saveTiles() }
     }
 
     private fun startClock() {
