@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -42,12 +42,29 @@ jobs:
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
-      - name: Upload debug APK
+      - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: WindowsMobileLauncher-debug-apk
           path: WindowsMobileLauncher/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Publish APK as GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: launcher-latest
+          name: Windows Mobile Launcher - Latest Build
+          prerelease: true
+          body: |
+            Debug build of the Windows Mobile Launcher for Android.
+
+            **Install steps:**
+            1. Download `app-debug.apk` below
+            2. Transfer it to your Android phone (USB, email, or cloud)
+            3. On your phone: Settings → Apps → Special app access → Install unknown apps → allow your file manager
+            4. Tap the APK file to install
+            5. Press Home → select **Windows Mobile Launcher** → tap Always
+          files: WindowsMobileLauncher/app/build/outputs/apk/debug/*.apk
 
       # Release variant is best-effort. Lint-vital is disabled to keep it fast;
       # the APK is unsigned and only provided for convenience.
