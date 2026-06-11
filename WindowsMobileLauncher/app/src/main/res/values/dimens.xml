@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tile dimensions based on 4-column grid -->
+    <!-- Each column = screen_width / 4 -->
+    <!-- Tile gap between tiles -->
+    <dimen name="tile_gap">3dp</dimen>
+    <dimen name="tile_margin">6dp</dimen>
+
+    <!-- Tile heights -->
+    <dimen name="tile_size_small">80dp</dimen>
+    <dimen name="tile_size_medium">160dp</dimen>
+    <dimen name="tile_size_large">320dp</dimen>
+
+    <!-- Status bar placeholder height -->
+    <dimen name="status_bar_height">24dp</dimen>
+
+    <!-- Bottom bar height -->
+    <dimen name="bottom_bar_height">56dp</dimen>
+
+    <!-- App list item dimensions -->
+    <dimen name="app_list_item_height">64dp</dimen>
+    <dimen name="app_list_icon_size">40dp</dimen>
+    <dimen name="app_list_header_height">56dp</dimen>
+
+    <!-- Typography -->
+    <dimen name="text_size_clock_large">52sp</dimen>
+    <dimen name="text_size_tile_label">12sp</dimen>
+    <dimen name="text_size_app_label">18sp</dimen>
+    <dimen name="text_size_header">22sp</dimen>
+</resources>

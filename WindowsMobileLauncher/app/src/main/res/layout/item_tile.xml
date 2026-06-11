@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/tile_gap">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/tileCard"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tile_size_medium"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp">
+
+            <!-- Clock tile views -->
+            <TextView
+                android:id="@+id/tileTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/wp_white"
+                android:textSize="48sp"
+                android:fontFamily="sans-serif-light"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/tileDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tileTime"
+                android:textColor="@color/wp_white"
+                android:textSize="14sp"
+                android:lineSpacingMultiplier="1.2"
+                android:visibility="gone"/>
+
+            <!-- Normal tile icon -->
+            <ImageView
+                android:id="@+id/tileIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                android:scaleType="fitCenter"/>
+
+            <!-- Tile label -->
+            <TextView
+                android:id="@+id/tileLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:textColor="@color/wp_white"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <!-- Edit mode badge (X button) -->
+            <ImageView
+                android:id="@+id/editBadge"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_remove"
+                android:background="@color/wp_accent_red"
+                android:padding="2dp"
+                android:visibility="gone"/>
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

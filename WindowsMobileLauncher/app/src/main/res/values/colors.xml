@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Windows Phone Background Colors -->
+    <color name="wp_background">#FF000000</color>
+    <color name="wp_background_light">#FF1C1C1C</color>
+    <color name="wp_surface">#FF262626</color>
+    <color name="wp_divider">#FF333333</color>
+
+    <!-- Text Colors -->
+    <color name="wp_white">#FFFFFFFF</color>
+    <color name="wp_text_primary">#FFFFFFFF</color>
+    <color name="wp_text_secondary">#FF999999</color>
+    <color name="wp_text_hint">#FF666666</color>
+
+    <!-- Windows Phone Accent Colors -->
+    <color name="wp_accent_blue">#FF0078D7</color>
+    <color name="wp_accent_cyan">#FF00B4FF</color>
+    <color name="wp_accent_teal">#FF00ABA9</color>
+    <color name="wp_accent_green">#FF339933</color>
+    <color name="wp_accent_lime">#FF8CBF26</color>
+    <color name="wp_accent_amber">#FFE3A21A</color>
+    <color name="wp_accent_yellow">#FFF0A30A</color>
+    <color name="wp_accent_orange">#FFDA532C</color>
+    <color name="wp_accent_red">#FFE51400</color>
+    <color name="wp_accent_magenta">#FFFF0097</color>
+    <color name="wp_accent_purple">#FF9F00A7</color>
+    <color name="wp_accent_olive">#FF6D8764</color>
+    <color name="wp_accent_steel">#FF647687</color>
+    <color name="wp_accent_mauve">#FF76608A</color>
+    <color name="wp_accent_taupe">#FF87794E</color>
+
+    <!-- Primary accent (default blue) -->
+    <color name="wp_accent">#FF0078D7</color>
+
+    <!-- Status bar -->
+    <color name="wp_status_bar">#CC000000</color>
+</resources>
