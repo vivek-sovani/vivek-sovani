@@ -34,11 +34,8 @@
         <item name="android:windowAnimationStyle">@style/WindowAnimation.WP</item>
     </style>
 
-    <style name="WPAlertDialog" parent="Theme.AppCompat.Dark.Dialog.Alert">
+    <style name="WPAlertDialog" parent="@android:style/Theme.DeviceDefault.Dark.Dialog.Alert">
         <item name="android:background">@color/wp_surface</item>
-        <item name="colorAccent">@color/wp_accent_blue</item>
-        <item name="android:textColorPrimary">@color/wp_white</item>
-        <item name="android:textColor">@color/wp_white</item>
     </style>
 
     <style name="WindowAnimation.WP" parent="@android:style/Animation.Activity">
