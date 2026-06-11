@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
@@ -66,9 +67,10 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
         }
         iconView.scaleType = ImageView.ScaleType.FIT_CENTER
 
-        // Label at bottom-left
+        // Label at bottom-left (WP10 sans-serif-light)
         labelView.apply {
             setTextColor(Color.WHITE)
+            typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
             textSize = when (tileData.tileSize) {
                 TileSize.SMALL -> 10f
                 TileSize.MEDIUM -> 12f
@@ -90,7 +92,8 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
         // Badge count top-right
         badgeView.apply {
             setTextColor(Color.WHITE)
-            textSize = 22f
+            typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
+            textSize = 13f
             gravity = Gravity.TOP or Gravity.END
             layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
                 gravity = Gravity.TOP or Gravity.END
@@ -109,9 +112,10 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
         backFace.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         val pad = dp(8)
 
-        // Back label (app name)
+        // Back label (app name, top of tile)
         backLabelView.apply {
             setTextColor(Color.WHITE)
+            typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
             textSize = 11f
             text = tileData.label
             maxLines = 1
@@ -123,9 +127,10 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
             }
         }
 
-        // Back count (large number)
+        // Back count (large centered number)
         backCountView.apply {
             setTextColor(Color.WHITE)
+            typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
             textSize = 36f
             gravity = Gravity.CENTER
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
