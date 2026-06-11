@@ -89,7 +89,14 @@ class LauncherActivity : AppCompatActivity() {
         setupWallpaper()
         tileGrid.refreshAccentColors()
         startBadgeUpdates()
-        registerReceiver(smsReceiver, IntentFilter("android.provider.Telephony.SMS_RECEIVED"))
+        // targetSdk 34 requires an export flag for runtime-registered receivers
+        try {
+            ContextCompat.registerReceiver(
+                this, smsReceiver,
+                IntentFilter("android.provider.Telephony.SMS_RECEIVED"),
+                ContextCompat.RECEIVER_EXPORTED
+            )
+        } catch (e: Exception) { }
     }
 
     override fun onPause() {
@@ -114,10 +121,16 @@ class LauncherActivity : AppCompatActivity() {
                 return
             } catch (e: Exception) { }
         }
-        val wm = WallpaperManager.getInstance(this)
-        val drawable = wm.drawable
-        binding.wallpaperImage.setImageDrawable(drawable)
-        binding.wallpaperImage.scaleType = ImageView.ScaleType.CENTER_CROP
+        // Reading the system wallpaper throws SecurityException on Android 13+;
+        // fall back to the authentic WP solid-black background.
+        try {
+            val wm = WallpaperManager.getInstance(this)
+            binding.wallpaperImage.setImageDrawable(wm.drawable)
+            binding.wallpaperImage.scaleType = ImageView.ScaleType.CENTER_CROP
+        } catch (e: Exception) {
+            binding.wallpaperImage.setImageDrawable(null)
+            binding.wallpaperImage.setBackgroundColor(Color.BLACK)
+        }
     }
 
     private fun setupTileGrid() {

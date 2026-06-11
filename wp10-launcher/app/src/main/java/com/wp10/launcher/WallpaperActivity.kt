@@ -15,7 +15,7 @@ class WallpaperActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWallpaperBinding
 
     private val imagePicker = registerForActivityResult(
-        ActivityResultContracts.GetContent()
+        ActivityResultContracts.OpenDocument()
     ) { uri ->
         uri?.let { setWallpaper(it) }
     }
@@ -26,7 +26,7 @@ class WallpaperActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnPickImage.setOnClickListener {
-            imagePicker.launch("image/*")
+            imagePicker.launch(arrayOf("image/*"))
         }
 
         binding.btnSystemWallpaper.setOnClickListener {
@@ -51,6 +51,8 @@ class WallpaperActivity : AppCompatActivity() {
     private fun setWallpaper(uri: Uri) {
         try {
             contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        } catch (e: Exception) { }
+        try {
             PrefsHelper.setWallpaperUri(this, uri.toString())
             binding.ivPreview.setImageURI(uri)
             setResult(RESULT_OK)

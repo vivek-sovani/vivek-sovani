@@ -19,13 +19,16 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 
+    // OpenDocument (not GetContent) so the URI grant can be persisted across reboots
     private val wallpaperPicker = registerForActivityResult(
-        ActivityResultContracts.GetContent()
+        ActivityResultContracts.OpenDocument()
     ) { uri ->
         if (uri != null) {
-            contentResolver.takePersistableUriPermission(
-                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
+            try {
+                contentResolver.takePersistableUriPermission(
+                    uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) { }
             PrefsHelper.setWallpaperUri(this, uri.toString())
             binding.ivWallpaperPreview.setImageURI(uri)
         }
@@ -53,20 +56,33 @@ class SettingsActivity : AppCompatActivity() {
         // Preview current wallpaper
         val uri = PrefsHelper.getWallpaperUri(this)
         if (uri != null) {
-            binding.ivWallpaperPreview.setImageURI(Uri.parse(uri))
+            try {
+                binding.ivWallpaperPreview.setImageURI(Uri.parse(uri))
+            } catch (e: Exception) {
+                showSystemWallpaperPreview()
+            }
         } else {
-            val wm = android.app.WallpaperManager.getInstance(this)
-            binding.ivWallpaperPreview.setImageDrawable(wm.drawable)
+            showSystemWallpaperPreview()
         }
 
         binding.btnChooseWallpaper.setOnClickListener {
-            wallpaperPicker.launch("image/*")
+            wallpaperPicker.launch(arrayOf("image/*"))
         }
 
         binding.btnClearWallpaper.setOnClickListener {
             PrefsHelper.setWallpaperUri(this, null)
+            binding.ivWallpaperPreview.setImageURI(null)
+            showSystemWallpaperPreview()
+        }
+    }
+
+    private fun showSystemWallpaperPreview() {
+        // Throws SecurityException on Android 13+; fall back to plain black
+        try {
             val wm = android.app.WallpaperManager.getInstance(this)
             binding.ivWallpaperPreview.setImageDrawable(wm.drawable)
+        } catch (e: Exception) {
+            binding.ivWallpaperPreview.setImageDrawable(null)
         }
     }
 
