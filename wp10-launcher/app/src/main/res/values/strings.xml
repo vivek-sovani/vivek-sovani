@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">WP10 Launcher</string>
+    <string name="start">Start</string>
+    <string name="apps">apps</string>
+    <string name="settings">settings</string>
+    <string name="pin_to_start">pin to Start</string>
+    <string name="unpin_from_start">unpin from Start</string>
+    <string name="resize">resize</string>
+    <string name="transparent">transparent</string>
+    <string name="search_hint">search</string>
+    <string name="choose_wallpaper">choose background</string>
+    <string name="accent_color">accent color</string>
+    <string name="theme">theme</string>
+    <string name="dark_theme">dark theme</string>
+</resources>

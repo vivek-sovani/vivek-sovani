@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#88000000">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/optionsCard"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:cardBackgroundColor="@color/wp_surface"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="0dp">
+
+            <!-- Tile name -->
+            <TextView
+                android:id="@+id/tvTileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-light"
+                android:background="@color/wp_accent" />
+
+            <!-- Transparency toggle -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Transparent tile"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <Switch
+                    android:id="@+id/switchTransparent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumbTint="@color/wp_accent"
+                    android:trackTint="#44FFFFFF" />
+
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#22FFFFFF" />
+
+            <!-- Size section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="resize"
+                android:textColor="#88FFFFFF"
+                android:textSize="12sp"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="6dp"
+                android:fontFamily="sans-serif-light" />
+
+            <!-- Size buttons grid -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btnSizeSmall"
+                    style="@style/WP.SizeButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="Small" />
+
+                <Button
+                    android:id="@+id/btnSizeMedium"
+                    style="@style/WP.SizeButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Medium" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="12dp"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btnSizeWide"
+                    style="@style/WP.SizeButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="Wide" />
+
+                <Button
+                    android:id="@+id/btnSizeLarge"
+                    style="@style/WP.SizeButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Large" />
+
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#22FFFFFF" />
+
+            <!-- Unpin -->
+            <Button
+                android:id="@+id/btnUnpin"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="unpin from Start"
+                android:textColor="#FF4444"
+                android:textSize="14sp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:fontFamily="sans-serif-light" />
+
+            <!-- Cancel -->
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="cancel"
+                android:textColor="#88FFFFFF"
+                android:textSize="14sp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:fontFamily="sans-serif-light" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

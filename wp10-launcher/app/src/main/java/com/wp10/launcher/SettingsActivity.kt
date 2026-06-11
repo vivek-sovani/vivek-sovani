@@ -1,0 +1,132 @@
+package com.wp10.launcher
+
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.net.Uri
+import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.wp10.launcher.databinding.ActivitySettingsBinding
+import com.wp10.launcher.util.PrefsHelper
+
+class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivitySettingsBinding
+
+    private val wallpaperPicker = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            contentResolver.takePersistableUriPermission(
+                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+            PrefsHelper.setWallpaperUri(this, uri.toString())
+            binding.ivWallpaperPreview.setImageURI(uri)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setupWallpaperSection()
+        setupAccentColors()
+        setupThemeToggle()
+        setupToolbar()
+    }
+
+    private fun setupToolbar() {
+        binding.btnBack.setOnClickListener {
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
+
+    private fun setupWallpaperSection() {
+        // Preview current wallpaper
+        val uri = PrefsHelper.getWallpaperUri(this)
+        if (uri != null) {
+            binding.ivWallpaperPreview.setImageURI(Uri.parse(uri))
+        } else {
+            val wm = android.app.WallpaperManager.getInstance(this)
+            binding.ivWallpaperPreview.setImageDrawable(wm.drawable)
+        }
+
+        binding.btnChooseWallpaper.setOnClickListener {
+            wallpaperPicker.launch("image/*")
+        }
+
+        binding.btnClearWallpaper.setOnClickListener {
+            PrefsHelper.setWallpaperUri(this, null)
+            val wm = android.app.WallpaperManager.getInstance(this)
+            binding.ivWallpaperPreview.setImageDrawable(wm.drawable)
+        }
+    }
+
+    private fun setupAccentColors() {
+        val currentColor = PrefsHelper.getAccentColor(this)
+        val adapter = AccentColorAdapter(PrefsHelper.ACCENT_COLORS, currentColor) { color ->
+            PrefsHelper.setAccentColor(this, color)
+            setResult(RESULT_OK)
+        }
+        binding.rvAccentColors.apply {
+            layoutManager = GridLayoutManager(this@SettingsActivity, 5)
+            this.adapter = adapter
+        }
+    }
+
+    private fun setupThemeToggle() {
+        binding.switchDarkTheme.isChecked = PrefsHelper.isDarkTheme(this)
+        binding.switchDarkTheme.setOnCheckedChangeListener { _, checked ->
+            PrefsHelper.setDarkTheme(this, checked)
+        }
+    }
+
+    // Color swatch adapter
+    inner class AccentColorAdapter(
+        private val colors: List<Int>,
+        private var selected: Int,
+        private val onColorPicked: (Int) -> Unit
+    ) : RecyclerView.Adapter<AccentColorAdapter.VH>() {
+
+        inner class VH(val frame: FrameLayout) : RecyclerView.ViewHolder(frame)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+            val size = resources.getDimensionPixelSize(R.dimen.color_swatch_size)
+            val frame = FrameLayout(parent.context).apply {
+                layoutParams = ViewGroup.MarginLayoutParams(size, size).apply {
+                    setMargins(8, 8, 8, 8)
+                }
+            }
+            return VH(frame)
+        }
+
+        override fun onBindViewHolder(holder: VH, position: Int) {
+            val color = colors[position]
+            val circle = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(color)
+                if (color == selected) {
+                    setStroke(6, Color.WHITE)
+                } else {
+                    setStroke(0, Color.TRANSPARENT)
+                }
+            }
+            holder.frame.background = circle
+            holder.frame.setOnClickListener {
+                selected = color
+                onColorPicked(color)
+                notifyDataSetChanged()
+            }
+        }
+
+        override fun getItemCount() = colors.size
+    }
+}

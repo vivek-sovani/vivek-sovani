@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.WP10Launcher" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/wp_accent</item>
+        <item name="colorPrimaryDark">@color/wp_background</item>
+        <item name="colorAccent">@color/wp_accent</item>
+        <item name="android:windowBackground">@color/wp_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Theme.WP10Launcher.Launcher" parent="Theme.WP10Launcher">
+        <item name="android:windowBackground">@color/wp_background</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="Theme.WP10Launcher.Dark" parent="Theme.WP10Launcher">
+        <item name="android:windowBackground">@color/wp_background</item>
+    </style>
+
+    <style name="Theme.WP10Launcher.Translucent" parent="Theme.WP10Launcher">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="WP.SizeButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+        <item name="strokeColor">@color/wp_accent</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+</resources>

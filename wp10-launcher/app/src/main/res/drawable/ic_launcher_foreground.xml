@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Windows logo-style 4-tile icon -->
+    <rect android:x="20" android:y="20" android:width="30" android:height="30" android:fillColor="#FFFFFF"/>
+    <rect android:x="58" android:y="20" android:width="30" android:height="30" android:fillColor="#FFFFFF"/>
+    <rect android:x="20" android:y="58" android:width="30" android:height="30" android:fillColor="#FFFFFF"/>
+    <rect android:x="58" android:y="58" android:width="30" android:height="30" android:fillColor="#FFFFFF"/>
+</vector>
