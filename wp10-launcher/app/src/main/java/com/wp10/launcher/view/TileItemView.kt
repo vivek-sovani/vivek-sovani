@@ -214,6 +214,7 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
     }
 
     fun flipTile() {
+        if (isShowingBack) return
         val flipOut = ObjectAnimator.ofFloat(frontFace, "rotationY", 0f, 90f).apply { duration = 200 }
         val flipIn = ObjectAnimator.ofFloat(backFace, "rotationY", -90f, 0f).apply { duration = 200 }
         flipOut.addListener(object : android.animation.AnimatorListenerAdapter() {
@@ -222,7 +223,6 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
                 backFace.visibility = View.VISIBLE
                 flipIn.start()
                 isShowingBack = true
-                // Flip back after 3 seconds
                 liveHandler.postDelayed({ flipBack() }, 3000)
             }
         })
@@ -231,6 +231,7 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
     }
 
     private fun flipBack() {
+        if (!isShowingBack) return
         val flipOut = ObjectAnimator.ofFloat(backFace, "rotationY", 0f, 90f).apply { duration = 200 }
         val flipIn = ObjectAnimator.ofFloat(frontFace, "rotationY", -90f, 0f).apply { duration = 200 }
         flipOut.addListener(object : android.animation.AnimatorListenerAdapter() {

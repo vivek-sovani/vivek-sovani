@@ -14,6 +14,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.CallLog
 import android.provider.Telephony
+import android.telephony.TelephonyManager
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
@@ -36,6 +37,24 @@ class LauncherActivity : AppCompatActivity() {
     private val smsReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctx: Context, intent: Intent) {
             updateSmsBadge()
+        }
+    }
+
+    private val phoneStateReceiver = object : BroadcastReceiver() {
+        private var wasRinging = false
+        override fun onReceive(ctx: Context, intent: Intent) {
+            val state = intent.getStringExtra(TelephonyManager.EXTRA_STATE)
+            when (state) {
+                TelephonyManager.EXTRA_STATE_RINGING -> wasRinging = true
+                TelephonyManager.EXTRA_STATE_IDLE -> {
+                    if (wasRinging) {
+                        // Call ended from ringing state = missed call
+                        badgeHandler.postDelayed({ updateCallBadge() }, 1000)
+                    }
+                    wasRinging = false
+                }
+                TelephonyManager.EXTRA_STATE_OFFHOOK -> wasRinging = false
+            }
         }
     }
 
@@ -73,12 +92,20 @@ class LauncherActivity : AppCompatActivity() {
                 ContextCompat.RECEIVER_EXPORTED
             )
         } catch (e: Exception) { }
+        try {
+            ContextCompat.registerReceiver(
+                this, phoneStateReceiver,
+                IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED),
+                ContextCompat.RECEIVER_EXPORTED
+            )
+        } catch (e: Exception) { }
     }
 
     override fun onPause() {
         super.onPause()
         badgeHandler.removeCallbacksAndMessages(null)
         try { unregisterReceiver(smsReceiver) } catch (e: Exception) { }
+        try { unregisterReceiver(phoneStateReceiver) } catch (e: Exception) { }
     }
 
     // ─── Setup ───────────────────────────────────────────────────
