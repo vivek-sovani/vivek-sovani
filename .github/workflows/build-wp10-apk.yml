@@ -1,0 +1,67 @@
+name: Build WP10 Launcher APK
+
+on:
+  push:
+    branches:
+      - claude/windows-mobile-android-launcher-gsiusj
+    paths:
+      - 'wp10-launcher/**'
+      - '.github/workflows/build-wp10-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: wp10-launcher
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      # The repo ships no gradle-wrapper.jar, so provision Gradle directly.
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.2'
+
+      - name: Build debug APK
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Upload debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wp10-launcher-debug-apk
+          path: wp10-launcher/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Publish APK as GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: wp10-launcher-latest
+          name: WP10 Launcher - Latest Build
+          prerelease: true
+          body: |
+            Debug build of the WP10 (Windows Phone 10 style) Launcher for Android.
+
+            **Install steps:**
+            1. Download `app-debug.apk` below
+            2. Transfer it to your Android phone (USB, email, or cloud)
+            3. On your phone: Settings → Apps → Special app access → Install unknown apps → allow your file manager
+            4. Tap the APK file to install
+            5. Press Home → select **WP10 Launcher** → tap Always
+          files: wp10-launcher/app/build/outputs/apk/debug/*.apk

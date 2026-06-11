@@ -161,7 +161,6 @@ class TileItemView(context: Context, var tileData: TileData) : FrameLayout(conte
             it.gravity = when (tileData.tileSize) {
                 TileSize.SMALL -> Gravity.CENTER
                 else -> Gravity.CENTER_HORIZONTAL or Gravity.TOP
-                    .also { _ -> }
             }
             it.topMargin = when (tileData.tileSize) {
                 TileSize.SMALL -> 0

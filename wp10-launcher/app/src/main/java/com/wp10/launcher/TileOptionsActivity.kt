@@ -87,7 +87,7 @@ class TileOptionsActivity : AppCompatActivity() {
         }
 
         // Dismiss on outside touch
-        binding.root.setOnClickListener {
+        binding.optionsRoot.setOnClickListener {
             setResult(RESULT_CANCELED)
             finish()
         }
