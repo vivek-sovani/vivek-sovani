@@ -120,6 +120,10 @@ class AppsFragment : Fragment() {
     }
 
     private fun pinToStart(app: AppInfo) {
+        if (app.isPinned) {
+            android.widget.Toast.makeText(requireContext(), "${app.label} is already on Start", android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
         val tile = TileData(
             packageName = app.packageName,
             activityName = app.activityName,
@@ -127,6 +131,7 @@ class AppsFragment : Fragment() {
             tileSize = TileSize.MEDIUM
         )
         tileManager.pinTile(tile)
+        adapter.markAsPinned(app.packageName)
         android.widget.Toast.makeText(requireContext(), "${app.label} pinned to Start", android.widget.Toast.LENGTH_SHORT).show()
     }
 

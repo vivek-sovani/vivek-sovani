@@ -18,13 +18,24 @@
 
     <TextView
         android:id="@+id/tvAppName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_marginStart="16dp"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:fontFamily="sans-serif-light"
         android:maxLines="1"
         android:ellipsize="end" />
+
+    <TextView
+        android:id="@+id/tvPinnedBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="pinned"
+        android:textColor="@color/wp_accent"
+        android:textSize="11sp"
+        android:fontFamily="sans-serif-light"
+        android:visibility="gone" />
 
 </LinearLayout>

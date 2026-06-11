@@ -1,6 +1,5 @@
 package com.wp10.launcher.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +45,15 @@ class AppListAdapter(
         return items.indexOfFirst { it is ListItem.Header && it.letter == letter }
     }
 
+    fun markAsPinned(packageName: String) {
+        items.forEachIndexed { index, item ->
+            if (item is ListItem.App && item.info.packageName == packageName) {
+                item.info.isPinned = true
+                notifyItemChanged(index)
+            }
+        }
+    }
+
     override fun getItemViewType(position: Int) = when (items[position]) {
         is ListItem.Header -> VIEW_TYPE_HEADER
         is ListItem.App -> VIEW_TYPE_APP
@@ -79,10 +87,12 @@ class AppListAdapter(
     inner class AppVH(view: View) : RecyclerView.ViewHolder(view) {
         private val ivIcon: ImageView = view.findViewById(R.id.ivAppIcon)
         private val tvName: TextView = view.findViewById(R.id.tvAppName)
+        private val tvPinned: TextView = view.findViewById(R.id.tvPinnedBadge)
 
         fun bind(app: AppInfo) {
             ivIcon.setImageDrawable(app.icon)
             tvName.text = app.label
+            tvPinned.visibility = if (app.isPinned) View.VISIBLE else View.GONE
             itemView.setOnClickListener { onAppClick(app) }
             itemView.setOnLongClickListener {
                 onAppLongClick(app)
